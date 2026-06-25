@@ -17,4 +17,6 @@
 export ALLOW_MISSING_DEPENDENCIES=true
 export LC_ALL=C
 
-add_lunch_combo omni_gm8go-eng
+for i in eng user userdebug; do
+add_lunch_combo lineage_gm8go-${i};
+done

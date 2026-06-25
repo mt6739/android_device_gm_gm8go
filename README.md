@@ -1,4 +1,4 @@
-TWRP Device Tree for gm8go
+LineageOS Device Tree for gm8go
 ===========================================
 
 General mobile gm 8 go is a low-end smartphone from GM.	

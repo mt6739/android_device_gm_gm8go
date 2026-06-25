@@ -1,0 +1,2 @@
+/data/vendor/audiohal(/.*)?    u:object_r:audio_vendor_data_file:s0
+/vendor/bin/hw/android\.hardware\.audio@2\.0-service-mediatek    u:object_r:hal_audio_default_exec:s0

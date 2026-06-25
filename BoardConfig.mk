@@ -1,13 +1,22 @@
-
+# Copyright (C) 2018 The Lineage Project
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 DEVICE_PATH := device/gm/gm8go
 
-# For building with minimal manifest
-ALLOW_MISSING_DEPENDENCIES := true
-
 # Architecture
 TARGET_ARCH := arm
-TARGET_ARCH_VARIANT := armv7-a
+TARGET_ARCH_VARIANT := armv7-a-neon
 TARGET_CPU_ABI := armeabi-v7a
 TARGET_CPU_ABI2 := armeabi
 #TARGET_CPU_VARIANT := generic
@@ -17,15 +26,14 @@ TARGET_CPU_VARIANT := cortex-a53
 TARGET_OTA_ASSERT_DEVICE := gm8go,GM8_go_sc
 
 # File systems
+BOARD_BOOTIMAGE_PARTITION_SIZE := 25165824
+BOARD_RECOVERYIMAGE_PARTITION_SIZE := 25165824
+BOARD_SYSTEMIMAGE_PARTITION_SIZE := 1291845632
+BOARD_VENDORIMAGE_PARTITION_SIZE := 478150656
+BOARD_CACHEIMAGE_PARTITION_SIZE := 117440512
+BOARD_USERDATAIMAGE_PARTITION_SIZE := 13377715712
 
-BOARD_BOOTIMAGE_PARTITION_SIZE := 0x01800000
-BOARD_RECOVERYIMAGE_PARTITION_SIZE := 0x01800000
-BOARD_SYSTEMIMAGE_PARTITION_SIZE := 0x4d000000
-BOARD_CACHEIMAGE_PARTITION_SIZE := 0x07000000
-BOARD_USERDATAIMAGE_PARTITION_SIZE := 0x31d5fbe00
-
-# Partitions types
-
+# Partition types
 BOARD_HAS_LARGE_FILESYSTEM := true
 BOARD_SYSTEMIMAGE_PARTITION_TYPE := ext4
 BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
@@ -35,82 +43,71 @@ TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 TARGET_COPY_OUT_VENDOR := vendor
 
-# Encryption
-TW_INCLUDE_CRYPTO := true
-TW_INCLUDE_CRYPTO_FBE := true
-ifeq ($(TW_INCLUDE_CRYPTO),true)
-  TW_CRYPTO_FS_TYPE := "f2fs"
-  TW_CRYPTO_REAL_BLKDEV := "/dev/block/platform/bootdevice/by-name/userdata"
-  TW_CRYPTO_MNT_POINT := "/data"
-  TW_CRYPTO_FS_OPTIONS := "nosuid,nodev,noatime,discard,inline_data,inline_xattr,data=ordered"
-endif
-
 # Kernel
-BOARD_KERNEL_CMDLINE := bootopt=64S3,32S1,32S1 product.type=normal androidboot.selinux=enforcing buildvariant=user
-TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
+BOARD_KERNEL_CMDLINE := bootopt=64S3,32S1,32S1 androidboot.selinux=permissive
+#TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/zImage
 BOARD_KERNEL_BASE := 0x40000000
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_RAMDISK_OFFSET := 0x05000000
+BOARD_KERNEL_OFFSET = 0x00008000
 BOARD_KERNEL_TAGS_OFFSET := 0x04000000
 BOARD_FLASH_BLOCK_SIZE := 131072 # (BOARD_KERNEL_PAGESIZE * 64)
-BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
-BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
-BOARD_KERNEL_IMAGE_NAME := zImage
-#TARGET_KERNEL_ARCH := arm
-#TARGET_KERNEL_HEADER_ARCH := arm
-#TARGET_KERNEL_SOURCE := 
-#TARGET_KERNEL_CONFIG := gm8go_defconfig
+BOARD_MKBOOTIMG_ARGS := --kernel_offset $(BOARD_KERNEL_OFFSET) --ramdisk_offset $(BOARD_RAMDISK_OFFSET) --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
+#BOARD_KERNEL_IMAGE_NAME := zImage
+BOARD_KERNEL_IMAGE_NAME := zImage-dtb
+TARGET_KERNEL_ARCH := arm
+TARGET_KERNEL_HEADER_ARCH := arm
+TARGET_KERNEL_SOURCE := kernel/gm/gm8go
+TARGET_KERNEL_CONFIG := gm8go_lineage_defconfig
+TARGET_KERNEL_CROSS_COMPILE_PREFIX := arm-eabi-
+KERNEL_TOOLCHAIN := $(ANDROID_BUILD_TOP)/prebuilts/gcc/linux-x86/arm/gcc-linaro-6.3.1_arm-eabi/bin
 
-#TARGET_SYSTEM_PROP := $(LOCAL_PATH)/system.prop
+TARGET_SYSTEM_PROP := $(LOCAL_PATH)/system.prop
 
 # Platform
 TARGET_BOARD_PLATFORM := mt6739
+TARGET_BOARD_PLATFORM_GPU := POWERVR_GE8100
+BOARD_VNDK_VERSION := 27
+#BOARD_VNDK_VERSION := current
+PRODUCT_FULL_TREBLE := true
 
 # Bootloader
 TARGET_NO_BOOTLOADER := true
 TARGET_BOOTLOADER_BOARD_NAME := mt6739
 
-# system informations
-PLATFORM_SECURITY_PATCH := 2020-02-05
-VENDOR_SECURITY_PATCH := 2020-02-05
-PLATFORM_VERSION := 8.1.0
+# Audio
+USE_XML_AUDIO_POLICY_CONF := 1
 
-# App
-TW_EXCLUDE_SUPERSU := true
+# Charger Mode
+BOARD_CHARGER_ENABLE_SUSPEND := true
 
-# TWRP Configuration
-TW_THEME := portrait_hdpi
-RECOVERY_SDCARD_ON_DATA := true
-BOARD_SUPPRESS_SECURE_ERASE := true
-TW_HAS_MTP := true
-TW_INCLUDE_NTFS_3G := true
-TW_EXCLUDE_DEFAULT_USB_INIT := true
+# Graphics
+TARGET_USES_HWC2 := true
+
+# MTK
+BOARD_USES_MTK_HARDWARE := true
+
 TARGET_USES_MKE2FS := true
-TW_EXCLUDE_TWRPAPP := true
-TW_IGNORE_MISC_WIPE_DATA := true
-HAVE_SELINUX := true
-TWRP_INCLUDE_LOGCAT := true
-TARGET_USES_LOGD := true
-TW_INPUT_BLACKLIST := "hbtp_vm"
-TW_DEFAULT_EXTERNAL_STORAGE := true
-TW_DEFAULT_BRIGHTNESS := 200
-TW_MAX_BRIGHTNESS := 255
-TW_EXTRA_LANGUAGES := true
-TW_SCREEN_BLANK_ON_BOOT := true
-TW_NO_SCREEN_BLANK := true
-BOARD_HAS_NO_SELECT_BUTTON := true
-PRODUCT_COPY_FILES += device/gm/gm8go/recovery.fstab:recovery/root/etc/twrp.fstab
-TARGET_RECOVERY_FSTAB := device/gm/gm8go/recovery.fstab
-TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
-TW_CUSTOM_BATTERY_PATH := /sys/class/power_supply/battery
-TW_CUSTOM_CPU_TEMP_PATH := /sys/devices/virtual/thermal/thermal_zone0/temp
 
-TW_NO_EXFAT := false
-TW_USE_TOOLBOX := false
-TW_USE_BUSYBOX := true
+# Properties
+TARGET_SYSTEM_PROP := build/make/target/board/treble_system.prop
+BOARD_PROPERTY_OVERRIDES_SPLIT_ENABLED := true
 
-TW_INCLUDE_RESETPROP := true
-TW_INCLUDE_REPACKTOOLS := true
+# Recovery
+TARGET_RECOVERY_FSTAB := $(DEVICE_PATH)/rootdir/etc/fstab.mt6739
 
-TW_EXTERNAL_STORAGE_PATH := "/external_sd"
-TW_EXTERNAL_STORAGE_MOUNT_POINT := "external_sd"
+# Sepolicy
+BOARD_PLAT_PRIVATE_SEPOLICY_DIR += $(COMMON_PATH)/sepolicy/private
+BOARD_VENDOR_SEPOLICY_DIRS += device/your_oem/your_device/sepolicy/vendor
+
+# Vintf
+DEVICE_MANIFEST_FILE := $(DEVICE_PATH)/configs/vintf/manifest.xml
+DEVICE_MATRIX_FILE := $(DEVICE_PATH)/configs/vintf/compatibility_matrix.xml
+
+# Treble
+BOARD_VNDK_VERSION  := current
+BOARD_VNDK_RUNTIME_DISABLE := true
+TARGET_COPY_OUT_VENDOR := vendor
+
+# Inherit from the proprietary version
+-include vendor/wiko/mt6739-common/BoardConfigVendor.mk

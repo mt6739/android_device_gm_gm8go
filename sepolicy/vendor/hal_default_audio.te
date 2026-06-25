@@ -1,0 +1,9 @@
+type hal_audio_default, domain;
+hal_server_domain(hal_audio_default, hal_audio)
+
+type hal_audio_default_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(hal_audio_default)
+
+# Allow the HAL to access the data folder created in your .rc
+allow hal_audio_default audio_vendor_data_file:dir create_dir_perms;
+allow hal_audio_default audio_vendor_data_file:file create_file_perms;

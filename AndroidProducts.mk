@@ -15,9 +15,4 @@
 #
 
 PRODUCT_MAKEFILES := \
-    $(LOCAL_DIR)/omni_gm8go.mk
-
-COMMON_LUNCH_CHOICES := \
-    omni_gm8go-user \
-    omni_gm8go-userdebug \
-    omni_gm8go-eng
+    $(LOCAL_DIR)/lineage.mk
